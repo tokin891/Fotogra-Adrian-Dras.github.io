@@ -595,6 +595,7 @@
     display:none;
   }
   .form-msg.show{ display:block; }
+  .form-msg.error{ color:#ff6b6b; }
 
   .contact-info h4{ font-family:'Inter',sans-serif; font-weight:600; font-size:0.85rem; color:var(--grey-light); margin-bottom:10px; }
   .contact-info .line{ font-size:1.05rem; margin-bottom:26px; }

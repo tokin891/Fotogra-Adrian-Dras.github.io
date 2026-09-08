@@ -53,7 +53,7 @@
       <div class="ph ph-hero">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/></svg>
         <span>Miejsce na Twoje zdjęcie</span>
-        <img src="Hero/1.png" alt="Adrian Dras - fotograf" onerror="this.remove()">
+        <img src="Hero/ja3.png" alt="Adrian Dras - fotograf" onerror="this.remove()">
       </div>
       <div class="stat-chip chip-1"><strong>2 lata</strong><span>doświadczenia w fotografii</span></div>
       <div class="stat-chip chip-2"><strong>Wałbrzych</strong><span>/ Wrocław</span></div>
@@ -67,10 +67,10 @@
       <div class="ph ph-about">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
         <span>Miejsce na portret</span>
-        <img src="O-mnie/1.jpg" alt="Adrian Dras - portret" onerror="this.remove()">
+        <img src="Hero/ja4.png" alt="Adrian Dras - portret" onerror="this.remove()">
       </div>
       <div class="about-accent">
-        <img src="O-mnie/2.jpg" alt="Adrian Dras podczas sesji zdjęciowej" onerror="this.remove()">
+        <img src="Portfolio/4.jpg" alt="Adrian Dras podczas sesji zdjęciowej" onerror="this.remove()">
       </div>
     </div>
     <div class="about-text">
@@ -473,13 +473,56 @@
   });
 
   // ---- contact form ----
+  // Formularz wysyła wiadomość na Twój email przez Formspree (bez własnego serwera).
+  // Jak to podłączyć (2 minuty, za darmo):
+  // 1) Wejdź na https://formspree.io i załóż konto (może być na adrianfotodras@gmail.com).
+  // 2) Utwórz nowy formularz ("New Form"), jako odbiorcę wpisz adrianfotodras@gmail.com.
+  // 3) Formspree poda Ci endpoint w stylu: https://formspree.io/f/xxxxxxxx
+  // 4) Wklej ten adres poniżej w miejsce FORMSPREE_ENDPOINT.
+  // 5) Wyślij testową wiadomość ze strony i potwierdź adres email klikając link, który przyśle Formspree (jednorazowo).
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xeaqpgre';
+
   const form = document.getElementById('contactForm');
   const formMsg = document.getElementById('formMsg');
-  form.addEventListener('submit', (e) => {
+  const formSubmitBtn = form.querySelector('button[type="submit"]');
+  const formSubmitLabel = formSubmitBtn.textContent;
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }
-    formMsg.classList.add('show');
-    form.reset();
+
+    if (FORMSPREE_ENDPOINT.includes('TWOJ_ID_FORMULARZA')) {
+      formMsg.textContent = 'Formularz nie jest jeszcze podłączony do skrzynki email — patrz komentarz w kodzie (FORMSPREE_ENDPOINT).';
+      formMsg.classList.add('show', 'error');
+      return;
+    }
+
+    formSubmitBtn.disabled = true;
+    formSubmitBtn.textContent = 'Wysyłanie…';
+    formMsg.classList.remove('show', 'error');
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: new FormData(form)
+      });
+
+      if (response.ok) {
+        formMsg.textContent = 'Dzięki! Wiadomość dotarła — odezwę się w ciągu 24 godzin.';
+        formMsg.classList.remove('error');
+        formMsg.classList.add('show');
+        form.reset();
+      } else {
+        throw new Error('send-failed');
+      }
+    } catch (err) {
+      formMsg.textContent = 'Coś poszło nie tak. Spróbuj ponownie lub napisz bezpośrednio na adrianfotodras@gmail.com.';
+      formMsg.classList.add('show', 'error');
+    } finally {
+      formSubmitBtn.disabled = false;
+      formSubmitBtn.textContent = formSubmitLabel;
+    }
   });
 </script>
 
